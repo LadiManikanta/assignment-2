@@ -111,14 +111,22 @@ const middlewareCheck = (request, response, next) => {
 };
 const changeStyle = (item) => {
   return {
-    username: item.user_name,
+    username: item.username,
     tweet: item.tweet,
-    dateTime: item.date_time,
+    dateTime: item.dateTime,
   };
 };
 app.get("/user/tweets/feed/", middlewareCheck, async (request, response) => {
-    const {username} = request;
-    const getQuery = `
+  const { username } = request;
+  const idCandidate = `
+      SELECT user_id
+      FROM user
+      WHERE username ='${username}'
+    
+    `;
+  const idSe = await db.get(idCandidate);
+  console.log(idSe);
+  const getQuery = `
      SELECT
        user.username, tweet.tweet, tweet.date_time AS dateTime
      FROM
@@ -128,15 +136,59 @@ app.get("/user/tweets/feed/", middlewareCheck, async (request, response) => {
       INNER JOIN user
       ON tweet.user_id = user.user_id
     WHERE
-      follower.follower_user_id = ${id of the logged in user}
+      follower.follower_user_id = ${idSe.user_id}
     ORDER BY
       tweet.date_time DESC
     LIMIT 4;`;
-  
 
   const data = await db.all(getQuery);
   response.send(data.map((doll) => changeStyle(doll)));
 });
+const nameChange = (name) => {
+  let hell = "";
+  if (name.username === "narendramodi") {
+    hell = "Narendra Modi";
+  } else if (name.username === "JimCameron") {
+    hell = "Jim Cameron";
+  }
+  return {
+    name: hell,
+  };
+};
 
+app.get("/user/following/", middlewareCheck, async (request, response) => {
+  const { username } = request;
+  const query1 = `
+    SELECT user_id
+    FROM user
+    WHERE username = '${username}';
+  `;
+  const loggedInUser = await db.get(query1);
+  const query2 = `
+    SELECT following_user_id
+    FROM follower
+    WHERE follower_user_id = ${loggedInUser.user_id};
+  `;
+  const followersIds = await db.all(query2);
+  console.log(followersIds);
+  const followTable = `
+    SELECT *
+    FROM follower;
+  `;
+  const data = await db.all(followTable);
+  console.log(data);
+  const names = [];
+  for (let less of followersIds) {
+    console.log(less.following_user_id);
+    const query3 = `
+      SELECT username
+      FROM user
+      WHERE user_id = ${less.following_user_id};
+    `;
+    const followerName = await db.get(query3);
+    names.push(followerName);
+  }
+  console.log(names);
+  response.send(names.map((name) => nameChange(name)));
+});
 module.exports = app;
-

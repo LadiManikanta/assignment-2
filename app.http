@@ -16,6 +16,9 @@ Content-Type: application/json
   "password":"biden@123"
 }
 ###
-GET http://localhost:2222/2/tweets/feed/
+GET http://localhost:2222/user/tweets/feed/
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjgwNTI0MDE2fQ.HBLev85awDw5ky2bUWP-Sfj8RABSFdg-jewRs22rLpo
+###
+GET http://localhost:2222/user/following/
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkpvZUJpZGVuIiwiaWF0IjoxNjgxNTU0NDg2fQ.K0Mds1zmIlcudVsWaZkNPkX5ehzU_kPUkV8dXNvfePU
 ###
