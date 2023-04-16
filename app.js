@@ -158,37 +158,19 @@ const nameChange = (name) => {
 
 app.get("/user/following/", middlewareCheck, async (request, response) => {
   const { username } = request;
-  const query1 = `
-    SELECT user_id
-    FROM user
-    WHERE username = '${username}';
-  `;
-  const loggedInUser = await db.get(query1);
-  const query2 = `
-    SELECT following_user_id
-    FROM follower
-    WHERE follower_user_id = ${loggedInUser.user_id};
-  `;
-  const followersIds = await db.all(query2);
-  console.log(followersIds);
-  const followTable = `
-    SELECT *
-    FROM follower;
-  `;
-  const data = await db.all(followTable);
-  console.log(data);
-  const names = [];
-  for (let less of followersIds) {
-    console.log(less.following_user_id);
-    const query3 = `
-      SELECT username
+  const idCandidate = `
+      SELECT user_id
       FROM user
-      WHERE user_id = ${less.following_user_id};
+      WHERE username ='${username}'
+    
     `;
-    const followerName = await db.get(query3);
-    names.push(followerName);
-  }
-  console.log(names);
-  response.send(names.map((name) => nameChange(name)));
+  const idSe = await db.get(idCandidate);
+  const tweetsQuery = `
+    SELECT
+      name
+    FROM follower INNER JOIN user on user.user_id = follower.follower_user_id
+    WHERE follower.following_user_id = ${idSe.user_id};`;
+  const getData = await db.all(tweetsQuery);
+  response.send(getData);
 });
 module.exports = app;
